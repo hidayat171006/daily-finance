@@ -24,6 +24,14 @@ const EXPENSE_CATEGORIES = [
   'Pengeluaran Lainnya'
 ]
 
+// Helper format angka dengan pemisah ribuan titik (contoh: 1000000 -> "1.000.000")
+const formatDisplayAmount = (val) => {
+  if (val === undefined || val === null || val === '') return ''
+  const clean = String(val).replace(/\D/g, '').replace(/^0+(?!$)/, '')
+  if (!clean) return ''
+  return clean.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
+
 export default function TransactionModal({ 
   isOpen, 
   onClose, 
@@ -31,7 +39,7 @@ export default function TransactionModal({
   editingTransaction = null 
 }) {
   const [type, setType] = useState(() => editingTransaction?.type || 'expense')
-  const [amount, setAmount] = useState(() => (editingTransaction?.amount ? String(editingTransaction.amount) : ''))
+  const [amount, setAmount] = useState(() => formatDisplayAmount(editingTransaction?.amount))
   const [category, setCategory] = useState(() => {
     if (editingTransaction?.category) return editingTransaction.category
     return editingTransaction?.type === 'income' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]
@@ -51,11 +59,17 @@ export default function TransactionModal({
     setCategory(newType === 'income' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0])
   }
 
+  const handleAmountChange = (e) => {
+    const formatted = formatDisplayAmount(e.target.value)
+    setAmount(formatted)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMsg('')
 
-    const numAmount = parseFloat(amount)
+    const cleanAmount = amount.replace(/\D/g, '')
+    const numAmount = parseFloat(cleanAmount)
     if (isNaN(numAmount) || numAmount <= 0) {
       setErrorMsg('Harap masukkan nominal yang valid dan lebih dari 0.')
       return
@@ -137,13 +151,12 @@ export default function TransactionModal({
               <span className="input-prefix">Rp</span>
               <input
                 id="amount-input"
-                type="number"
-                min="1"
-                step="any"
+                type="text"
+                inputMode="numeric"
                 placeholder="0"
                 className="form-input"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={handleAmountChange}
                 required
                 autoFocus
               />

@@ -8,8 +8,8 @@ export default function SupabaseGuideModal({ isOpen, onClose }) {
 
   if (!isOpen) return null
 
-  const sqlSchema = `-- 1. Buat tabel transaksi di Supabase SQL Editor
-CREATE TABLE IF NOT EXISTS transactions (
+  const sqlSchema = `-- 1. Buat tabel transaksi di Supabase SQL Editor (jika belum dibuat)
+CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   type VARCHAR(20) NOT NULL CHECK (type IN ('income', 'expense')),
   amount NUMERIC(15, 2) NOT NULL CHECK (amount > 0),
@@ -19,14 +19,20 @@ CREATE TABLE IF NOT EXISTS transactions (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Aktifkan Row Level Security (RLS)
-ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
+-- 2. Berikan izin akses tabel ke role anon dan authenticated (Mencegah "permission denied")
+GRANT ALL ON TABLE public.transactions TO anon, authenticated;
 
--- 3. Kebijakan akses anonim publik (atau sesuaikan dengan kebutuhan auth Anda)
+-- 3. Aktifkan Row Level Security (RLS)
+ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
+
+-- 4. Hapus policy lama jika sudah ada agar tidak error duplikat
+DROP POLICY IF EXISTS "Akses publik penuh transaksi" ON public.transactions;
+
+-- 5. Kebijakan akses anonim publik
 CREATE POLICY "Akses publik penuh transaksi" 
-ON transactions 
+ON public.transactions 
 FOR ALL 
-TO anon 
+TO anon, authenticated
 USING (true) 
 WITH CHECK (true);`
 
