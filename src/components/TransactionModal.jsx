@@ -64,6 +64,26 @@ export default function TransactionModal({
     setAmount(formatted)
   }
 
+  // Tambah nol otomatis (+000, +00.000, +000.000)
+  const handleAddZeros = (zeros) => {
+    const clean = amount.replace(/\D/g, '')
+    if (!clean || clean === '0') {
+      setAmount(formatDisplayAmount('1' + zeros))
+      return
+    }
+    const newNum = clean + zeros
+    if (newNum.length > 14) return
+    setAmount(formatDisplayAmount(newNum))
+  }
+
+  // Tambah nominal instan (+10rb, +50rb, +100rb)
+  const handleQuickAdd = (valueToAdd) => {
+    const clean = amount.replace(/\D/g, '')
+    const currentVal = parseFloat(clean) || 0
+    const total = currentVal + valueToAdd
+    setAmount(formatDisplayAmount(total))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMsg('')
@@ -160,6 +180,65 @@ export default function TransactionModal({
                 required
                 autoFocus
               />
+            </div>
+            
+            {/* Shortcut Cepat Tambah Nol & Nominal */}
+            <div className="quick-amount-chips">
+              <button
+                type="button"
+                className="chip-btn chip-zero"
+                onClick={() => handleAddZeros('000')}
+                title="Tambah 3 nol (Ribu)"
+              >
+                +000
+              </button>
+              <button
+                type="button"
+                className="chip-btn chip-zero"
+                onClick={() => handleAddZeros('00000')}
+                title="Tambah 5 nol"
+              >
+                +00.000
+              </button>
+              <button
+                type="button"
+                className="chip-btn chip-zero"
+                onClick={() => handleAddZeros('000000')}
+                title="Tambah 6 nol (Juta)"
+              >
+                +000.000
+              </button>
+              <button
+                type="button"
+                className="chip-btn"
+                onClick={() => handleQuickAdd(10000)}
+              >
+                +10rb
+              </button>
+              <button
+                type="button"
+                className="chip-btn"
+                onClick={() => handleQuickAdd(50000)}
+              >
+                +50rb
+              </button>
+              <button
+                type="button"
+                className="chip-btn"
+                onClick={() => handleQuickAdd(100000)}
+              >
+                +100rb
+              </button>
+              {amount && (
+                <button
+                  type="button"
+                  className="chip-btn chip-clear"
+                  onClick={() => setAmount('')}
+                  title="Hapus nominal"
+                >
+                  Hapus
+                </button>
+              )}
             </div>
           </div>
 

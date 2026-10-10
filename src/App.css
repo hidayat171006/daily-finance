@@ -1074,6 +1074,63 @@
   padding-left: 42px;
 }
 
+/* Shortcut Cepat Tambah Nol & Nominal */
+.quick-amount-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip-btn {
+  background: var(--bg-main, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.chip-btn:hover {
+  background: var(--border-subtle, #f1f5f9);
+  border-color: #cbd5e1;
+  color: var(--text-primary, #0f172a);
+}
+
+.chip-btn:active {
+  transform: scale(0.96);
+}
+
+.chip-btn.chip-zero {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+  font-weight: 700;
+}
+
+.chip-btn.chip-zero:hover {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+
+.chip-btn.chip-clear {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #be123c;
+  margin-left: auto;
+}
+
+.chip-btn.chip-clear:hover {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  color: #9f1239;
+}
+
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--primary-500);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
