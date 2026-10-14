@@ -6,9 +6,8 @@ import TransactionTable from './components/TransactionTable'
 import FinanceCharts from './components/FinanceCharts'
 import ReportView from './components/ReportView'
 import TransactionModal from './components/TransactionModal'
-import SupabaseGuideModal from './components/SupabaseGuideModal'
+import DatabaseGuideModal from './components/DatabaseGuideModal'
 import { transactionService } from './services/transactionService'
-import { isSupabaseConfigured } from './lib/supabase'
 import { CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react'
 import './App.css'
 
@@ -19,6 +18,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState(null)
   const [isGuideOpen, setIsGuideOpen] = useState(false)
+  const [isDbConnected, setIsDbConnected] = useState(false)
   const [toast, setToast] = useState(null) // { type: 'success' | 'error', message: string }
 
   // Tampilkan notifikasi toast sesaat
@@ -29,9 +29,12 @@ function App() {
     }, 3500)
   }, [])
 
-  // Muat transaksi dari service (Supabase atau LocalStorage)
+  // Muat transaksi dari service (MySQL XAMPP atau LocalStorage)
   const refreshTransactions = useCallback(async () => {
     try {
+      const conn = await transactionService.checkConnection()
+      setIsDbConnected(conn.connected)
+
       const data = await transactionService.getAll()
       setTransactions(data || [])
     } catch (err) {
@@ -44,6 +47,11 @@ function App() {
     let active = true
     async function initData() {
       try {
+        const conn = await transactionService.checkConnection()
+        if (active) {
+          setIsDbConnected(conn.connected)
+        }
+
         const data = await transactionService.getAll()
         if (active) {
           setTransactions(data || [])
@@ -104,11 +112,12 @@ function App() {
 
   return (
     <div className="app-layout">
-      {/* Sidebar Hijau Modern */}
+      {/* Sidebar Modern */}
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
-        onOpenSupabaseGuide={() => setIsGuideOpen(true)}
+        onOpenDatabaseGuide={() => setIsGuideOpen(true)}
+        isDbConnected={isDbConnected}
       />
 
       {/* Konten Utama */}
@@ -127,13 +136,13 @@ function App() {
           </div>
         )}
 
-        {/* Banner Supabase jika belum terkonfigurasi */}
-        {!isSupabaseConfigured && (
+        {/* Banner XAMPP jika database MySQL belum terhubung */}
+        {!isDbConnected && (
           <div className="app-banner-notice" onClick={() => setIsGuideOpen(true)} role="button" tabIndex={0}>
             <div className="banner-content">
-              <strong>Info Penyimpanan:</strong> Aplikasi saat ini berjalan di mode <em>LocalStorage</em>. Ingin menghubungkan database Supabase?
+              <strong>Info Penyimpanan:</strong> MySQL XAMPP belum terhubung (berjalan di mode cadangan <em>LocalStorage</em>). Ingin menyambungkan ke MySQL?
             </div>
-            <span className="banner-link">Lihat Panduan Setup &rarr;</span>
+            <span className="banner-link">Lihat Panduan XAMPP &rarr;</span>
           </div>
         )}
 
@@ -207,10 +216,13 @@ function App() {
         />
       )}
 
-      {/* Modal Panduan Supabase */}
-      <SupabaseGuideModal
+      {/* Modal Panduan Database XAMPP */}
+      <DatabaseGuideModal
         isOpen={isGuideOpen}
-        onClose={() => setIsGuideOpen(false)}
+        onClose={() => {
+          setIsGuideOpen(false)
+          refreshTransactions()
+        }}
       />
     </div>
   )

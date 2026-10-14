@@ -7,9 +7,8 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react'
-import { isSupabaseConfigured } from '../lib/supabase'
 
-export default function Sidebar({ activeTab, setActiveTab, onOpenSupabaseGuide }) {
+export default function Sidebar({ activeTab, setActiveTab, onOpenDatabaseGuide, isDbConnected = false }) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'transactions', label: 'Riwayat Transaksi', icon: ReceiptText },
@@ -48,15 +47,15 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenSupabaseGuide }
       </nav>
 
       <div className="sidebar-footer">
-        <div className="status-card" onClick={onOpenSupabaseGuide} role="button" tabIndex={0}>
+        <div className="status-card" onClick={onOpenDatabaseGuide} role="button" tabIndex={0}>
           <div className="status-header">
             <Database size={16} />
             <span className="status-title">Status Database</span>
           </div>
           <div className="status-badge-container">
-            {isSupabaseConfigured ? (
+            {isDbConnected ? (
               <span className="badge badge-success">
-                <CheckCircle2 size={13} /> Supabase Aktif
+                <CheckCircle2 size={13} /> MySQL XAMPP Aktif
               </span>
             ) : (
               <span className="badge badge-warning">
@@ -65,9 +64,9 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenSupabaseGuide }
             )}
           </div>
           <p className="status-desc">
-            {isSupabaseConfigured 
-              ? 'Data tersimpan aman di cloud Supabase.' 
-              : 'Klik untuk panduan konfigurasi Supabase.'}
+            {isDbConnected 
+              ? 'Data tersimpan di database MySQL XAMPP.' 
+              : 'Klik untuk panduan koneksi MySQL XAMPP.'}
           </p>
         </div>
         <div className="sidebar-version">
